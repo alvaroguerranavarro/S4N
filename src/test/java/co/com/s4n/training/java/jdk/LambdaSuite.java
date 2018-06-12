@@ -42,6 +42,18 @@ public class LambdaSuite {
     }
 
     @Test
+    public void usarUnaInterfaceFuncional3(){
+
+        InterfaceDeEjemplo i = (x,y)->x*y;
+
+        ClaseDeEjemplo instancia = new ClaseDeEjemplo();
+
+        int resultado = instancia.metodoDeEjemplo1(1,i);
+
+        assertTrue(resultado==3);
+    }
+
+    @Test
     public void usarUnaInterfaceFuncional2(){
 
         BiFunction<Integer, Integer, Integer> f = (x, y) -> new Integer(x.intValue()+y.intValue());
@@ -52,6 +64,17 @@ public class LambdaSuite {
 
         assertTrue(resultado==4);
     }
+    @Test
+    public void usarUnaInterfaceFuncional4(){
+
+        BiFunction<Integer, Integer, Integer> f = (x, y) -> new Integer(x.intValue() + y.intValue());
+
+        ClaseDeEjemplo instancia = new ClaseDeEjemplo();
+
+        int resultado = instancia.metodoDeEjemplo2(3,f);
+
+        assertTrue(resultado==6);
+    }
 
     class ClaseDeEjemplo2{
 
@@ -61,6 +84,17 @@ public class LambdaSuite {
     }
     @Test
     public void usarUnaFuncionConTiposPrimitivos(){
+        IntBinaryOperator f = (x, y) -> x + y;
+
+        ClaseDeEjemplo2 instancia = new ClaseDeEjemplo2();
+
+        int resultado = instancia.metodoDeEjemplo2(1,2,f);
+
+        assertEquals(3,resultado);
+    }
+
+    @Test
+    public void usarUnaFuncionConTiposPrimitivos1(){
         IntBinaryOperator f = (x, y) -> x + y;
 
         ClaseDeEjemplo2 instancia = new ClaseDeEjemplo2();
@@ -91,7 +125,7 @@ public class LambdaSuite {
 
         ClaseDeEjemplo3 instancia = new ClaseDeEjemplo3();
 
-        String resultado = instancia.operarConSupplier(s2);
+        String resultado = instancia.operarConSupplier(s1);
 
         assertEquals("El int que me han entregado es: 4",resultado);
     }
@@ -105,17 +139,23 @@ public class LambdaSuite {
         }
     }
 
+    class ClaseDeEjemplo5{
+
+        public void operarConConsumer(int i, Consumer<Integer> c){
+            c.accept(i);
+        }
+    }
+
     @Test
     public void usarUnaFuncionConConsumer(){
         Consumer<Integer> c1 = x -> {
             System.out.println("Me han entregado este valor: "+x);
         };
 
-        ClaseDeEjemplo4 instancia = new ClaseDeEjemplo4();
+        ClaseDeEjemplo5 instancia = new ClaseDeEjemplo5();
 
-        instancia.operarConConsumer(c1);
-
+        instancia.operarConConsumer(5,c1);
 
     }
 
-}
+    }
