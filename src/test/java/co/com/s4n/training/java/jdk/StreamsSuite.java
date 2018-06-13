@@ -47,6 +47,17 @@ public class StreamsSuite {
 
     }
 
+
+    @Test
+    public void NewtestStreams2(){
+        List<String> list = new ArrayList<>();
+        Optional<String> first = list
+                .stream()
+                .findFirst();
+        assertTrue(!first.isPresent());
+        assertEquals("NONE",first.orElseGet(()->"NONE"));
+
+    }
     @Test
     public void testStreams3(){
         Optional<String> first = Stream.of("a1", "a2", "a3")
@@ -366,8 +377,5 @@ public class StreamsSuite {
     //Reduce
     //ParalellStreams
     //https://dzone.com/articles/think-twice-using-java-8
-
-
-
 
 }
