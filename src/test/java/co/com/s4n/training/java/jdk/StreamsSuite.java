@@ -367,7 +367,4 @@ public class StreamsSuite {
     //ParalellStreams
     //https://dzone.com/articles/think-twice-using-java-8
 
-
-
-
 }
