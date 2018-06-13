@@ -172,25 +172,69 @@ public class LambdaSuite {
 
 
     @Test
-    public void t(){
-        EjercicioInterface i = (x,y,z) ->{
-          Integer partial = x.get()+y.get()+z.get();
-          Consumer<Integer> c = n -> {
-              Integer suma = partial.intValue() + n;
-              System.out.println("Consumer ---->>> " + (partial + n));
-              System.out.println("Consumer ---->>> " + suma);
-          };
+    public void t() {
+        EjercicioInterface i = (x, y, z) -> {
+            Integer partial = x.get() + y.get() + z.get();
+            Consumer<Integer> c = n -> {
+                Integer suma = partial.intValue() + n;
+                System.out.println("Consumer ---->>> " + (partial + n));
+                System.out.println("Consumer ---->>> " + suma);
+            };
 
-          return c;
+            return c;
 
         };
 
-        Supplier x = () ->1;
-        Supplier y = () ->2;
-        Supplier z = () ->3;
+        Supplier x = () -> 1;
+        Supplier y = () -> 2;
+        Supplier z = () -> 3;
 
-        Consumer<Integer> consumer = i.sam(x,y,z);
+        Consumer<Integer> consumer = i.sam(x, y, z);
         consumer.accept(new Integer(9));
     }
 
+    // New Test
+
+    @Test
+    public void Lambda() {
+        EjercicioInterface i = (x, y, z) -> {
+            Integer partial = x.get() * y.get() * z.get();
+            Consumer<Integer> c = n -> {
+                Integer multip = partial.intValue() * n;
+                System.out.println("Consumer ---->>> " + (partial * n));
+                System.out.println("Consumer ---->>> " + multip);
+                assertEquals(18,multip.intValue());
+            };
+
+            return c;
+
+        };
+
+        Supplier x = () -> 1;
+        Supplier y = () -> 2;
+        Supplier z = () -> 3;
+
+        Consumer<Integer> consumer = i.sam(x, y, z);
+        consumer.accept(new Integer(3));
+    }
+
+
+    class ClaseDeEjemplo1 {
+        public int metodoDeEjemplo1(int z, InterfaceDeEjemplo i) {
+            return z * i.metodoDeEjemplo(5, 5);
+        }
+    }
+
+
+        @Test
+        public void usarUnaInterfaceFuncional7() {
+
+            InterfaceDeEjemplo i = (x, y) -> x * y;
+
+            ClaseDeEjemplo1 instancia = new ClaseDeEjemplo1();
+
+            int resultado = instancia.metodoDeEjemplo1(3, i);
+
+            assertEquals(75,resultado);
+        }
 }
