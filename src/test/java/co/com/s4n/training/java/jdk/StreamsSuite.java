@@ -55,7 +55,8 @@ public class StreamsSuite {
                 .stream()
                 .findFirst();
         assertTrue(!first.isPresent());
-        assertEquals("NONE",first.orElseGet(()->"NONE"));
+        String res = first.orElseGet(()->"NONE");
+        assertEquals("NONE",res);
 
     }
     @Test
