@@ -72,11 +72,23 @@ public class StreamsSuite {
     public void testStreams4(){
         OptionalInt first = IntStream.range(1, 4)
                 .findFirst();
-
         assertEquals(1,first.orElseGet(()->666));
 
     }
 
+    @Test
+    public void testStreams41(){
+        IntStream first = IntStream.range(1, 4);
+
+        List<Integer> rest = first.boxed().collect(Collectors.toList());
+
+        assertTrue(rest.size()==3);
+
+        assertTrue(rest.contains(1));
+        assertTrue(rest.contains(2));
+        assertTrue(rest.contains(3));
+        assertFalse(rest.contains(4));
+    }
 
     @Test
     public void testStreams6(){
@@ -87,6 +99,7 @@ public class StreamsSuite {
         assertEquals(5D,average.orElseGet(()->666),0D);
 
     }
+
 
     @Test
     public void testStreams7(){
@@ -206,10 +219,14 @@ public class StreamsSuite {
         // Cuántos elementos pasan por el stream?
         boolean b = Stream.of("d2", "a2", "b1", "b3", "c")
                 .map(s -> {
+                    System.out.println("filter: " + s);
                     return s.toUpperCase();
+
                 })
                 .anyMatch(s -> {
+                    System.out.println("filter: " + s);
                     return s.startsWith("A");
+
                 });
 
         assertTrue(b);
@@ -233,6 +250,13 @@ public class StreamsSuite {
 
     @Test
     public void testStreams13() {
+        List<String> collect = Stream.of("d2", "a2", "b1", "b3", "c")
+                .filter(s -> {
+                    return s.startsWith("A");
+                })
+                .map(s -> {
+                    return s.toUpperCase();
+                }).collect(Collectors.toList());
         //TODO: cambia el orden de map y filter
         assertTrue(true);
     }
@@ -242,6 +266,7 @@ public class StreamsSuite {
         Stream<String> stream =
                 Stream.of("d2", "a2", "b1", "b3", "c")
                         .filter(s -> s.startsWith("a"));
+        // es la lambda (s -> s.startsWith("a"));
 
         boolean b = stream.anyMatch(s -> true);
         assertTrue(b);
@@ -260,8 +285,8 @@ public class StreamsSuite {
         boolean b = streamSupplier.get().anyMatch(s -> true);
         boolean b1 = streamSupplier.get().noneMatch(s -> true);
 
-        assert(b);
-        assert(b1);
+        assertTrue(b);
+        assertFalse(b1);
 
     }
 
@@ -313,6 +338,9 @@ public class StreamsSuite {
                         .collect(Collectors.toList());
 
         assertTrue(filtered.size()==2);
+
+        assertTrue(filtered.contains("Peter"));
+        assertTrue(filtered.contains("Pamela"));
 
     }
 
