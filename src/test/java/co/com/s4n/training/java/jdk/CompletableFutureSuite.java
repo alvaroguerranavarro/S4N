@@ -80,7 +80,7 @@ public class CompletableFutureSuite {
         });
 
         try {
-            String s = future.get(500, TimeUnit.MILLISECONDS);
+            String s = future.get(350, TimeUnit.MILLISECONDS);
             assertEquals(s, "Hello");
         }catch(Exception e){
 
