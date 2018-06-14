@@ -7,7 +7,10 @@ import org.junit.Test;
 
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class CompletableFutureSuite {
@@ -215,6 +218,7 @@ public class CompletableFutureSuite {
                     return "Hello";
                 })
                 .thenCompose(s -> {
+                    // s es el valor  que nos entrega el futuro completable de arriba
                     System.out.println(testName + " - compose corriendo en el thread: " + Thread.currentThread().getName());
                     return CompletableFuture.supplyAsync(() ->{
                         System.out.println(testName + " - CompletableFuture interno corriendo en el thread: " + Thread.currentThread().getName());
@@ -229,19 +233,74 @@ public class CompletableFutureSuite {
         }
     }
 
+    class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+    @Test
+    public void nt8(){
+
+        String testName = "nt8";
+
+        CompletableFuture<Person> completableFuture = CompletableFuture
+                .supplyAsync(() -> {
+                    System.out.println(testName + " - future corriendo en el thread: " + Thread.currentThread().getName());
+
+                    return "Pamela.18";
+                })
+                .thenCompose(s -> {
+                    // s es el valor  que nos entrega el futuro completable de arriba
+                    System.out.println(testName + " - compose corriendo en el thread: " + Thread.currentThread().getName());
+                    List<String>  Persona =  Arrays.asList(s.split("\\."));
+                    String nombre = Persona.get(0);
+                    int edad = Integer.parseInt(Persona.get(1));
+
+                    return CompletableFuture.supplyAsync(() ->{
+                        System.out.println(testName + " - CompletableFuture interno corriendo en el thread: " + Thread.currentThread().getName());
+                        return new Person(nombre,edad);
+                    } );
+                });
+
+        try {
+            assertEquals("Pamela", completableFuture.get().name);
+            assertEquals(18, completableFuture.get().age);
+        }catch(Exception e){
+            assertTrue(false);
+        }
+    }
+
+
+
     @Test
     public void t9(){
 
         String testName = "t9";
 
-
         // El segundo parametro de thenCombina es un BiFunction la cual sí tiene que tener retorno.
         CompletableFuture<String> completableFuture = CompletableFuture
-                .supplyAsync(() -> "Hello")
+                .supplyAsync(() -> {
+                    System.out.println(testName + " - future corriendo en el thread: " + Thread.currentThread().getName());
+                    return "Hello";
+                })
                 .thenCombine(
-                        CompletableFuture.supplyAsync(() -> " World"),
-                        (s1, s2) -> s1 + s2
-                );
+                        CompletableFuture.supplyAsync(() ->
+                        {
+                            System.out.println(testName + " - future corriendo en el thread: " + Thread.currentThread().getName());
+                        return " World";}),
+                        (s1, s2) -> {
+                            System.out.println(testName + " - future corriendo en el thread: " + Thread.currentThread().getName());
+                           return s1 + s2;
+                        });
 
         try {
             assertEquals("Hello World", completableFuture.get());
@@ -274,8 +333,8 @@ public class CompletableFutureSuite {
 
         String testName = "t11";
 
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        CompletableFuture f = CompletableFuture.supplyAsync(()->"Hello",es);
+        ExecutorService es = Executors.newFixedThreadPool(1); // aun hilo
+        CompletableFuture f = CompletableFuture.supplyAsync(()->"Hello",es); // "es" se le dice la caja de hilo que se va a usar
 
         f.supplyAsync(() -> "Hello")
                 .thenCombineAsync(
