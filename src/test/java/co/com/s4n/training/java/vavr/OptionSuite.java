@@ -9,7 +9,7 @@ import io.vavr.control.Option;
 import static io.vavr.API.None;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 
 import java.util.ArrayList;
 
@@ -191,6 +191,7 @@ public class OptionSuite {
     public void testGetOrElse(){
         Option<String> defined_option = Option.of("Hello!");
         Option<String> none = None();
+        System.out.println();
         assertEquals("failure - getOrElse did not get the current value of Option", "Hello!", defined_option.getOrElse("Goodbye!"));
         assertEquals("failure - getOrElse did not replace None", "Goodbye!", none.getOrElse("Goodbye!"));
     }
@@ -300,5 +301,54 @@ public class OptionSuite {
         Option<Integer> integers = For(esPar(2), d ->
                                    For(esPar(4), c -> Option(d+c))).toOption();
         assertEquals(integers,Some(6));
+    }
+
+
+    private Option<Integer> sumar (int a, int b){
+        System.out.println("sumando "+ a + "+" + b);
+        return Option.of(a+b);
+    }
+
+    private Option<Integer> restar (int a, int b){
+        System.out.println("restando "+ a + "-" + b);
+        return a-b >0 ? Option.of(a-b):None(); // da el option de la resta si es positva sino da None
+    }
+
+
+    @Test
+    public void flatMapInOPtion1(){
+
+       Option<Integer> resultado = sumar(1,1).flatMap(a -> sumar(a,1))
+             .flatMap(b -> sumar(b,1))
+             .flatMap(c->sumar(c,1))
+             .flatMap(d ->sumar(d,1));
+       assertEquals(resultado.getOrElse(666).intValue(),6);
+    }
+    @Test
+    public void flatMapInOPtionNone(){
+
+        Option<Integer> resultado = sumar(1,1).flatMap(a -> sumar(a,1))
+                .flatMap(b -> restar(b,4))  // El flatMap se ejecuta pero la lambda no, dado que flatMap al operar por None da none
+                .flatMap(c->sumar(c,1))
+                .flatMap(d ->sumar(d,1));
+        assertEquals(resultado, None());
+        assertEquals(resultado.getOrElse(666).intValue(),666);
+    }
+
+    @Test
+    public void flatMapInOPtionFor(){
+
+        Option<Integer> res =
+            For(sumar(1,1), r1 ->
+            For(sumar(r1,1), r2 ->
+            For(sumar(r2,1), r3 -> sumar(r3,r1)))).toOption();
+        assertEquals(res.getOrElse(666).intValue(),6);
+    }
+
+    @Test
+    public void flatMapInOPtion(){
+        Option<Integer> o1 = Option.of(1);
+        Option<Option<Integer>> x =o1.map(i->Option.of(identidadPosibleNull(i.intValue()-3))); //Option de oPtion
+        Option<Integer> y = o1.flatMap(i-> Option.of(identidadPosibleNull(i.intValue()-3)));
     }
 }
