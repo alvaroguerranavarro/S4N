@@ -1,5 +1,6 @@
 package co.com.s4n.training.java.jdk;
 
+import static jdk.nashorn.internal.objects.Global.print;
 import static org.junit.Assert.*;
 
 import org.junit.Ignore;
@@ -329,6 +330,27 @@ public class CompletableFutureSuite {
     }
 
     @Test
+    public void testEnlaceConSupplyAsinc(){
+        String testName = "tprueba";
+
+        ExecutorService es = Executors.newFixedThreadPool(1); // aun hilo
+        CompletableFuture f = CompletableFuture.supplyAsync(()->"Hello",es);
+        CompletableFuture<String> f2 = f.supplyAsync(()->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+            sleep(500);
+            return "a";
+        },es).supplyAsync(()->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+            return "b";
+        },es);
+
+        try{
+            assertEquals(f2.get(),"b");
+        }catch (Exception e){
+            assertFalse(true);
+        }
+    }
+    @Test
     public void t11(){
 
         String testName = "t11";
@@ -351,4 +373,33 @@ public class CompletableFutureSuite {
 
     }
 
+
+    @Test
+    public void testThenApplyAsync(){
+        String testName = "tThenApplyAsync";
+
+        ExecutorService es = Executors.newFixedThreadPool(3); // dos hilo explicitos
+
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() ->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+                    sleep(500);
+                    return "a";
+                },es);
+
+        CompletableFuture<String> future = completableFuture.thenApplyAsync(s ->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+            sleep(500);
+            return s + " b"; },es).thenApplyAsync(s ->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+            sleep(500);
+            return s + " c"; },es).thenApplyAsync(s ->{
+            imprimirMensaje(testName + " - future corriendo en el thread: "+Thread.currentThread().getName());
+            sleep(500);
+            return s + " d"; },es);
+        try{
+            assertEquals(future.get(),"a b c d" );
+        }catch (Exception e){
+            assertFalse(true);
+        }
+    }
 }
