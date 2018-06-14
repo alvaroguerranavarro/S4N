@@ -9,6 +9,8 @@ import io.vavr.control.Option;
 import static io.vavr.API.None;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 import java.util.ArrayList;
 
 import static io.vavr.API.*;
@@ -24,6 +26,82 @@ import static org.junit.Assert.assertTrue;
 
 public class OptionSuite {
 
+
+    @Test
+    public void testConstruction1(){
+        Option<Integer> o = Option(null);
+        assertEquals(o,Option.none());
+    }
+
+    @Test
+    public void testConstruction2(){
+        Option<Integer> o = Option(1);
+        assertTrue(o.isDefined());
+        assertEquals(o,Some(1));
+    }
+
+    @Test
+    public void testConstruction3()
+    {
+        Option<Boolean> b = Option(esParPosibleNull(1));
+        assertEquals(b,Option.none());
+    }
+
+    @Test
+    public void testFilter()
+    {
+        Option<Integer> b = Option(identidadPosibleNull(2));
+        Option<Integer> r = b.filter(x->x.intValue()<4);
+        assertEquals(r.getOrElse(666).intValue(),2);
+    }
+
+    @Test
+    public void testFilterNone()
+    {
+        Option<Integer> b = Option(identidadPosibleNull(1));
+        Option<Integer> r = b.filter(x->x.intValue()<4);
+        assertEquals(r,Option.none());
+    }
+
+    @Test
+    public void mapInOption()
+    {
+        Option<Integer> o1 = Option(identidadPosibleNull(8));
+        Option<Integer> o2 = o1.map(x->x-8); // Resultado de la Lambda es un Option osea Some
+
+        assertEquals(o2,Some(0));
+    }
+
+    @Test
+    public void mapInOptionNone()
+    {
+        Option<Integer> o1 = Option(identidadPosibleNull(3));
+        Option<Integer> o2 = o1.map(x->x*3); // Resultado de la Lambda es un Option osea Some
+        System.out.println(o1.map(x->x*3));
+        assertEquals(o2,Option.none());
+    }
+
+    private Integer identidadPosibleNull(int i)
+    {
+        boolean res = false;
+        if(i%2==0){
+            return new Integer(i);
+        }
+        else {
+            return null;
+        }
+    }
+
+    private Boolean esParPosibleNull(int i)
+    {
+        boolean res = false;
+        if(i%2==0){
+            return new Boolean(true);
+        }
+        else {
+            return null;
+        }
+    }
 
     /**
      * Un option se puede filtar, y mostrar un some() o un none si no encuentra el resultado
