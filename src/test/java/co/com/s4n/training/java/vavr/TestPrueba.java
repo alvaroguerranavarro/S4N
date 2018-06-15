@@ -56,8 +56,8 @@ public class TestPrueba {
         Try<Integer> res =
                 For(Prueba.comparar(3,3),r0 ->
                         For(Prueba.postivo(r0),r1 ->
-                        For(Prueba.multiplicar(r1,r1),r2->
-                        Prueba.division(r2,0).recoverWith(Exception.class,Try.of(()-> 1))))).toTry();
+                            For(Prueba.multiplicar(r1,r1),r2->
+                                 Prueba.division(r2,0).recoverWith(Exception.class,Try.of(()-> 1))))).toTry();
         assertEquals(Success(1),res);
     }
 
