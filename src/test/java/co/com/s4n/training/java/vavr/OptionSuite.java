@@ -1,5 +1,6 @@
 package co.com.s4n.training.java.vavr;
 
+import co.com.s4n.training.java.jdk.Prueba;
 import org.junit.Test;
 
 
@@ -223,4 +224,54 @@ public class OptionSuite {
                                    For(esPar(4), c -> Option(d+c))).toOption();
         assertEquals(integers,Some(6));
     }
+
+    @Test
+    public void flatMapInOPtionMultiplicar(){
+        Option<Integer> multiplicar = Prueba.multiplicar(4,3).flatMap(a -> Prueba.multiplicar(a,1))
+                .flatMap(b -> Prueba.multiplicar(b,1))
+                .flatMap(c->Prueba.multiplicar(c,1))
+                .flatMap(d ->Prueba.multiplicar(d,1));
+        assertEquals(multiplicar.getOrElse(666).intValue(),12);
+    }
+    @Test
+    public void flatMapInOPtionForMultiplicar(){
+        Option<Integer> res =
+                For(Prueba.multiplicar(3,1), r1 ->
+                        For(Prueba.multiplicar(r1,1), r2 ->
+                                For(Prueba.multiplicar(r2,1), r3 -> Prueba.multiplicar(r3,1)))).toOption();
+        assertEquals(res.getOrElse(666).intValue(),3);
+    }
+    @Test
+    public void flatMapInOPtionComparar(){
+        Option<Integer> multiplicar = Prueba.comparar(2,1).flatMap(a -> Prueba.comparar(a,1))
+                .flatMap(b -> Prueba.comparar(b,1))
+                .flatMap(c->Prueba.comparar(c,1))
+                .flatMap(d ->Prueba.comparar(d,1));
+        assertEquals(multiplicar.getOrElse(666).intValue(),2);
+    }
+    @Test
+    public void flatMapInOPtionForComparar(){
+        Option<Integer> Comparar =
+                For(Prueba.comparar(5,5), r1 ->
+                        For(Prueba.comparar(r1,5), r2 ->
+                                For(Prueba.comparar(r2,5), r3 -> Prueba.comparar(r3,5)))).toOption();
+        assertEquals(Comparar.getOrElse(666).intValue(),5);
+    }
+    @Test
+    public void flatMapInOPtionDivision(){
+        Option<Integer> division = Prueba.division(50,2).flatMap(a -> Prueba.division(a,1))
+                .flatMap(b -> Prueba.division(b,1))
+                .flatMap(c->Prueba.division(c,1))
+                .flatMap(d ->Prueba.division(d,1));
+        assertEquals(division.getOrElse(666).intValue(),25);
+    }
+    @Test
+    public void flatMapInOPtionForDivision(){
+        Option<Integer> division =
+                For(Prueba.division(15,3), r1 ->
+                        For(Prueba.division(r1,1), r2 ->
+                                For(Prueba.division(r2,1), r3 -> Prueba.division(r3,1)))).toOption();
+        assertEquals(division.getOrElse(666).intValue(),5);
+    }
+
 }
