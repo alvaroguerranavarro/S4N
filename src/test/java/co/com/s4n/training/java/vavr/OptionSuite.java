@@ -227,7 +227,7 @@ public class OptionSuite {
 
     @Test
     public void flatMapInOPtionMultiplicar(){
-        Option<Integer> multiplicar = Prueba.multiplicar(4,3).flatMap(a -> Prueba.multiplicar(a,1))
+        Option<Integer> multiplicar = Prueba.multiplicar(4,3)
                 .flatMap(b -> Prueba.division(b,1))
                 .flatMap(c->Prueba.comparar(c,1))
                 .flatMap(d ->Prueba.postivo(d));
