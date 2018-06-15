@@ -228,17 +228,17 @@ public class OptionSuite {
     @Test
     public void flatMapInOPtionMultiplicar(){
         Option<Integer> multiplicar = Prueba.multiplicar(4,3).flatMap(a -> Prueba.multiplicar(a,1))
-                .flatMap(b -> Prueba.multiplicar(b,1))
-                .flatMap(c->Prueba.multiplicar(c,1))
-                .flatMap(d ->Prueba.multiplicar(d,1));
+                .flatMap(b -> Prueba.division(b,1))
+                .flatMap(c->Prueba.comparar(c,1))
+                .flatMap(d ->Prueba.postivo(d));
         assertEquals(multiplicar.getOrElse(666).intValue(),12);
     }
     @Test
     public void flatMapInOPtionForMultiplicar(){
         Option<Integer> res =
                 For(Prueba.multiplicar(3,1), r1 ->
-                        For(Prueba.multiplicar(r1,1), r2 ->
-                                For(Prueba.multiplicar(r2,1), r3 -> Prueba.multiplicar(r3,1)))).toOption();
+                        For(Prueba.division(r1,1), r2 ->
+                                For(Prueba.comparar(r2,1), r3 -> Prueba.postivo(r3)))).toOption();
         assertEquals(res.getOrElse(666).intValue(),3);
     }
     @Test
