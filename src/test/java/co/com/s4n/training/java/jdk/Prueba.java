@@ -33,4 +33,28 @@ public class Prueba {
         System.out.println("Dividiendo"+ a + "/" + b + "= "+a/b);
         return Option.of(a/b);
     }
+
+    public static Option<Integer> postivo (int a)
+    {
+        if (a>0)
+        {
+            System.out.println("Numero positivo "+ a);
+            return Option.of(a);
+        }
+        else
+        {
+            if (a<0)
+            {
+                System.out.println("Numero negativo "+ a);
+                return Option.of(a);
+            }
+            else
+            {
+                System.out.println("Numero igual a "+ 0);
+                return Option.of(0);
+            }
+        }
+    }
+
+
 }

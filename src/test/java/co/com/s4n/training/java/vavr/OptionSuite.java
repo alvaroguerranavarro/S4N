@@ -274,4 +274,13 @@ public class OptionSuite {
         assertEquals(division.getOrElse(666).intValue(),5);
     }
 
+    @Test
+    public void flatMapInOPtionPositivo(){
+        Option<Integer> division = Prueba.postivo(-50).flatMap(a -> Prueba.postivo(a))
+                .flatMap(b -> Prueba.postivo(b))
+                .flatMap(c->Prueba.postivo(c-50))
+                .flatMap(d ->Prueba.postivo(d));
+        assertEquals(division.getOrElse(666).intValue(),-100);
+    }
+
 }
