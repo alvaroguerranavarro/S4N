@@ -276,11 +276,19 @@ public class OptionSuite {
 
     @Test
     public void flatMapInOPtionPositivo(){
-        Option<Integer> division = Prueba.postivo(-50).flatMap(a -> Prueba.postivo(a))
+        Option<Integer> positivo = Prueba.postivo(-50).flatMap(a -> Prueba.postivo(a))
                 .flatMap(b -> Prueba.postivo(b))
                 .flatMap(c->Prueba.postivo(c-50))
                 .flatMap(d ->Prueba.postivo(d));
-        assertEquals(division.getOrElse(666).intValue(),-100);
+        assertEquals(positivo.getOrElse(666).intValue(),-100);
     }
 
+    @Test
+    public void flatMapInOPtionForPositivo(){
+        Option<Integer> positivo =
+                For(Prueba.postivo(15), r1 ->
+                        For(Prueba.postivo(-r1), r2 ->
+                                For(Prueba.postivo(r2+15), r3 -> Prueba.postivo(r3)))).toOption();
+        assertEquals(positivo.getOrElse(666).intValue(),0);
+    }
 }
