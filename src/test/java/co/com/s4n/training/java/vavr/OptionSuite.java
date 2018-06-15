@@ -2,7 +2,6 @@ package co.com.s4n.training.java.vavr;
 
 import org.junit.Test;
 
-
 import io.vavr.PartialFunction;
 import io.vavr.control.Option;
 
@@ -351,4 +350,5 @@ public class OptionSuite {
         Option<Option<Integer>> x =o1.map(i->Option.of(identidadPosibleNull(i.intValue()-3))); //Option de oPtion
         Option<Integer> y = o1.flatMap(i-> Option.of(identidadPosibleNull(i.intValue()-3)));
     }
+
 }
