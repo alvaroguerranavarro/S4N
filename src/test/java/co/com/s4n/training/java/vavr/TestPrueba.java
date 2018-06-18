@@ -4,6 +4,7 @@ import co.com.s4n.training.java.jdk.Prueba;
 import io.vavr.control.Try;
 import org.junit.Test;
 
+
 import static io.vavr.API.For;
 import static io.vavr.API.Success;
 import static junit.framework.TestCase.assertEquals;
