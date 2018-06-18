@@ -8,7 +8,6 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import io.vavr.concurrent.Promise;
 import org.junit.Test;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -16,8 +15,6 @@ import static io.vavr.API.Match;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import static io.vavr.Predicates.instanceOf;
@@ -26,7 +23,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import static io.vavr.API.*;
 import static org.junit.Assert.assertNotEquals;
@@ -745,4 +741,42 @@ public class FutureSuite {
         assertEquals("Failure - Validate Future with Promise",new Integer(15),myFutureOne.get());
         assertFalse("Failure - Validate myFuture is not complete",myFuture.isCompleted());
     }
+
+    @Test
+    public void testFuture() {
+
+        long inicio = System.nanoTime();
+
+        Future<Integer> f1 = Future.of(() -> {
+            Thread.sleep(500);
+            return 5 + 4;
+        });
+
+        Future<Integer> f2 = Future.of(() -> {
+            Thread.sleep(800);
+            return 5+4;
+        });
+
+        Future<Integer> f3 = Future.of(() -> {
+            Thread.sleep(300);
+            return 5 + 4;
+        });
+
+
+
+       Future<Integer> f4 = f1.flatMap(a->f2
+                       .flatMap(b->f3.
+                               flatMap(c-> Future.of(()-> a+b+c))));
+
+       f4.await();
+
+        long final1 = System.nanoTime();
+
+        long resul = TimeUnit.MILLISECONDS.convert(final1-inicio,TimeUnit.NANOSECONDS);
+
+        System.out.println(resul);
+        assertTrue(resul > 800);
+
+    }
+
 }
