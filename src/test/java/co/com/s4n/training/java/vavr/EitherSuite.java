@@ -1,5 +1,6 @@
 package co.com.s4n.training.java.vavr;
 
+import co.com.s4n.training.java.jdk.BiPeek;
 import io.vavr.Function1;
 import io.vavr.control.Either;
 import org.junit.Test;
@@ -28,11 +29,17 @@ public class EitherSuite {
     @Test
     public void swapToEither() {
         Either<Integer,String> myEitherR = Either.right("String");
+        System.out.println(myEitherR);
         Either<Integer,String> myEitherL = Either.left(14);
+        System.out.println(myEitherL);
         assertTrue("Valide swap before in Either Right", myEitherR.isRight());
-        assertTrue("Valide swap after in Either Right", myEitherR.swap().isLeft());
+        assertFalse("", myEitherR.isLeft());
+        assertTrue("Valide swap after in Eit.her Right", myEitherR.swap().isLeft());
+        assertFalse("", myEitherR.swap().isRight());
         assertTrue("Valide swap before in Either Left", myEitherL.isLeft());
+        assertFalse("", myEitherL.isRight());
         assertTrue("Valide swap after in Either Right", myEitherL.swap().isRight());
+        assertFalse("Eirther not is Rigth", myEitherL.swap().isLeft());
     }
 
     /**
@@ -73,6 +80,22 @@ public class EitherSuite {
 
     }
 
+    @Test
+    public void testEitherMap1() {
+        Either<String,Double> value = Either.right( 2.0 / 3);
+
+        assertEquals("Failure - Map in Right",
+                Right(4.0),
+                value.map(aDouble -> aDouble * 6));
+
+        Either<String,Double> value2 = Either.left("Left side");
+
+        assertEquals("Failure - the Either is not left",
+                Left("Left side"),
+                value2.map(aDouble -> aDouble * 6));
+
+    }
+
     /**
      * El flatmap por defecto operara el lado derecho, si el either tiene su informacion en el lado izquierdo
      * este no se modificara
@@ -91,6 +114,29 @@ public class EitherSuite {
         assertEquals("Failure - the Either is not left",
                 Left("Left side"),
                 e2.flatMap(aDouble -> Right(aDouble * 6)));
+    }
+
+
+    private Either<Integer,Integer> suma(Integer a, Integer b)
+    {
+        return (a+b)>0 ? Right(a+b) : Left(-1);
+    }
+
+
+    private Either<Integer,Integer> division(Integer a, Integer b)
+    {
+        return b==0 ? Right(a/b) : Right(0);
+    }
+
+    @Test
+    public void testEitherFlatMapRigth() {
+
+        Either<Integer,Integer> res = suma(4,4)
+                .flatMap(r1 -> suma(r1,2)
+                        .flatMap(r2->division(5,r2)));
+
+        assertEquals("Failure - the Either is not left",
+                Right(0),res);
 
     }
 
@@ -105,6 +151,16 @@ public class EitherSuite {
         assertEquals("value is even",
                 None(),
                 value.filter(it -> it % 2 == 0));
+    }
+
+    @Test
+    public void testEitherFilterSome() {
+
+        Either<String,Integer> value = Either.right(7);
+
+        assertEquals("value is even",
+                Some(7),
+                value.filter(it -> it % 1 == 7));
     }
 
     /**
@@ -128,6 +184,7 @@ public class EitherSuite {
         Function1<Either,Either> biMap = (Function1<Either, Either>) either ->
                 either.bimap(left,right);
 
+
         Either<String,Integer> value = Either.right(5);
         Either<String,Integer> value2 = Either.left("this is some");
 
@@ -147,6 +204,7 @@ public class EitherSuite {
         Consumer<Object> addIfTrue = element -> {
             result[0] += element;
         };
+
         myEitherR.orElseRun(addIfTrue);
         assertEquals("Valide swap before in Either Right",
                 "let's dance! ", result[0]);
@@ -174,7 +232,7 @@ public class EitherSuite {
             }
         };
 
-        myEitherL.peek(myConsumer);
+        Either<String, String> peek = myEitherL.peek(myConsumer);
         assertEquals("Validete Either with peek","default", valor[0]);
 
         myEitherR.peek(myConsumer);
@@ -183,6 +241,22 @@ public class EitherSuite {
         myEitherL.peekLeft(myConsumer);
         assertEquals("Validete Either with peek","foo", valor[0]);
     }
+
+
+    @Test
+    public void biPeek() {
+
+        Either<String, Integer> left = Either.left("1");
+        BiPeek<String,Integer> bk = new BiPeek<String, Integer>();
+        final String [] r = {""};
+        Consumer<String> cl = i -> {r[0] = "Left peeked";};
+        Consumer<Integer> cr = i -> {r[0] = "Right peeked";};
+
+        Either<String, Integer> execute = bk.execute(cl,cr,left);
+        System.out.println(execute);
+        assertEquals(r[0],"Left peeked");
+    }
+
 
     /**
      * Uso de pattern matching para capturar un Either.Left
