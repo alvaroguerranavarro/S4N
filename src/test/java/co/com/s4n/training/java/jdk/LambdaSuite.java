@@ -1,8 +1,6 @@
 package co.com.s4n.training.java.jdk;
 
 import static org.junit.Assert.*;
-
-import io.vavr.collection.List;
 import org.junit.Test;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;

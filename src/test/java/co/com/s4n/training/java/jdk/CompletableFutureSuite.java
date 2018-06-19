@@ -1,14 +1,10 @@
 package co.com.s4n.training.java.jdk;
 
-import static jdk.nashorn.internal.objects.Global.print;
 import static org.junit.Assert.*;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

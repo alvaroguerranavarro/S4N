@@ -4,16 +4,16 @@ import io.vavr.collection.CharSeq;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Validation;
-import org.junit.Test;
 import io.vavr.Function1;
 import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.assertTrue;
+
 
 public class ValidationSuite
 {

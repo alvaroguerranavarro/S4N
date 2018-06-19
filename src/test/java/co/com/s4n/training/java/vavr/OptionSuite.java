@@ -303,8 +303,6 @@ public class OptionSuite {
         assertEquals(integers,Some(6));
     }
 
-<<<<<<< HEAD
-
     private Option<Integer> sumar (int a, int b){
         System.out.println("sumando "+ a + "+" + b);
         return Option.of(a+b);
@@ -347,27 +345,26 @@ public class OptionSuite {
     }
 
     @Test
-    public void flatMapInOPtion(){
+    public void flatMapInOPtion() {
         Option<Integer> o1 = Option.of(1);
-        Option<Option<Integer>> x =o1.map(i->Option.of(identidadPosibleNull(i.intValue()-3))); //Option de oPtion
-        Option<Integer> y = o1.flatMap(i-> Option.of(identidadPosibleNull(i.intValue()-3)));
-=======
+        Option<Option<Integer>> x = o1.map(i -> Option.of(identidadPosibleNull(i.intValue() - 3))); //Option de oPtion
+        Option<Integer> y = o1.flatMap(i -> Option.of(identidadPosibleNull(i.intValue() - 3)));
+    }
     @Test
     public void flatMapInOPtionOPeraciones(){
-        Option<Integer> multiplicar = Prueba.multiplicar(4,3)
-                .flatMap(b -> Prueba.division(b,1))
-                .flatMap(c->Prueba.comparar(c,1))
-                .flatMap(d ->Prueba.postivo(d));
+        Option<Integer> multiplicar = Prueba.multiplicarOption(4,3)
+                .flatMap(b -> Prueba.divisionOption(b,1))
+                .flatMap(c->Prueba.compararOption(c,1))
+                .flatMap(d ->Prueba.postivoOption(d));
         assertEquals(multiplicar.getOrElse(666).intValue(),12);
     }
     @Test
     public void flatMapInOPtionForOPeraciones(){
         Option<Integer> res =
-                For(Prueba.multiplicar(3,1), r1 ->
-                        For(Prueba.division(r1,1), r2 ->
-                                For(Prueba.comparar(r2,1), r3 -> Prueba.postivo(r3)))).toOption();
+                For(Prueba.multiplicarOption(3,1), r1 ->
+                        For(Prueba.divisionOption(r1,1), r2 ->
+                                For(Prueba.compararOption(r2,1), r3 -> Prueba.postivoOption(r3)))).toOption();
         assertEquals(res.getOrElse(666).intValue(),3);
->>>>>>> feature/PruebaSuite
     }
 
 }
