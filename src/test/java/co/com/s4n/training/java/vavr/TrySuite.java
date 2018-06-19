@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import java.util.List;
 import java.util.function.Consumer;
 import static io.vavr.control.Try.failure;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TrySuite {
@@ -33,8 +34,10 @@ public class TrySuite {
                 Success(3),
                 myTrySuccess);
 
+        assertNotEquals(3,myTrySuccess);
+
         assertTrue("failed - the values is a Failure",
-                myTryFailure.isFailure());
+                myTryFailure.isFailure()); // verficamos que sea una falla
     }
 
     private String patternMyTry(Try<Integer> myTry) {
@@ -63,7 +66,7 @@ public class TrySuite {
 
     private Try<Integer> recoverMyTry(Integer a, Integer b) {
         return Try.of(() -> a / b).recover(x -> Match(x).of(
-                Case($(instanceOf(Exception.class)), -1)));
+                Case($(instanceOf(Exception.class)), -1))); //sale un sucess de -1
     }
 
     /**
@@ -112,11 +115,35 @@ public class TrySuite {
     public void testSuccessTransform() {
         Try<Integer> number = Try.of(() -> 5);
         String transform = number.transform(self -> self.get() + " example of text");
+        System.out.println(transform);
 
         assertEquals("Failure - it should transform the number to text",
                 "5 example of text",
                 transform);
     }
+
+    @Test
+    public void testMap(){
+        Try<String> cadena = Try.of(() -> "Alvaro");
+        Try<Integer> cadena1 = cadena.map(x -> x.length()); // un Success de Integer
+
+        assertEquals("Failure - it should transform the number to text",
+                Success(6),
+                cadena1);
+    }
+
+    @Test
+    public void testSuccessTransform2() {
+        Try<Integer> number = Try.of(() -> 5);
+        Try<Integer> transform = number.transform(self -> self);
+        System.out.println(transform);
+
+        assertEquals("Failure - it should transform the number to text",
+
+                Success(5),
+                transform);
+    }
+
 
     /**
      * La funcionalidad transform va a generar error sobre un try con error.
@@ -330,6 +357,78 @@ public class TrySuite {
                 Try.failure(new ArithmeticException("/ by zero")).toString() ,
                 aTry2.toString());
     }
+
+    @Test
+    public void testTryAndRecoverWith1() {
+
+        Try<Integer> aTry = Try.of(() -> 2/0).recover(ArithmeticException.class,2);
+        assertEquals("Does not recover of 2/0", Try.of(() -> 2), aTry);
+    }
+
+    private Try<Integer> suma(Integer a, Integer b)
+    {
+        return Try.of(()->a+b);
+    }
+
+
+    private Try<Integer> division(Integer a, Integer b)
+    {
+        return Try.of(()->a/b);
+    }
+
+    @Test
+    public void testMonadicCompositionWithFlatMap()
+    {
+        Try<Integer> res = suma(1,2)
+                .flatMap(r0->suma(r0,r0))
+                    .flatMap(r1->suma(r1,-6))
+                        .flatMap(r2 -> division(r2,r2));
+        System.out.println(res);
+        assertTrue(res.isFailure());
+    }
+
+    @Test
+    public void testMonadicCompositionWithFor() {
+
+        Try<Integer> res =
+                For(suma(1, 2), r0->
+                For(suma(r0,r0),r1->
+                For(suma(r1,-6),r2->
+                    division(r2,r2)))).toTry();
+        assertTrue(res.isFailure());
+    }
+
+    @Test
+    public void testRecoverFlatMap() {
+
+        Try<Integer> res = suma(1,2)
+                .flatMap(r0->suma(r0,r0))
+                .flatMap(r1->suma(r1,-6))
+                .flatMap(r2 -> division(r2,r2).recover(ArithmeticException.class, -1));
+        assertEquals(Success(-1),res);
+    }
+
+    private Try<Integer> divisionrecuperar(Integer a,Integer b)
+    {
+        return Try.of(()->a/b).recoverWith(ArithmeticException.class,Try.of(() ->  -1));
+    }
+
+    @Test
+    public void testRecoverWithFlatMap() {
+
+        Try<Integer> res = suma(1,2)
+                .flatMap(r0->suma(r0,r0))
+                .flatMap(r1->suma(r1,-6))
+                .flatMap(r2 -> divisionrecuperar(r2,r2));
+        assertEquals(Success(-1),res);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     /**
      *  El Recover retorna el valor a recuperar, pero sin Try, permitiendo que lance un Exception
      *  si, falla
