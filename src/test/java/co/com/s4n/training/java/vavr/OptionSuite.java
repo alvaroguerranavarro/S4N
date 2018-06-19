@@ -2,13 +2,14 @@ package co.com.s4n.training.java.vavr;
 
 import org.junit.Test;
 
-
 import io.vavr.PartialFunction;
 import io.vavr.control.Option;
 
 import static io.vavr.API.None;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+
+
 import java.util.ArrayList;
 
 import static io.vavr.API.*;
@@ -24,6 +25,82 @@ import static org.junit.Assert.assertTrue;
 
 public class OptionSuite {
 
+
+    @Test
+    public void testConstruction1(){
+        Option<Integer> o = Option(null);
+        assertEquals(o,Option.none());
+    }
+
+    @Test
+    public void testConstruction2(){
+        Option<Integer> o = Option(1);
+        assertTrue(o.isDefined());
+        assertEquals(o,Some(1));
+    }
+
+    @Test
+    public void testConstruction3()
+    {
+        Option<Boolean> b = Option(esParPosibleNull(1));
+        assertEquals(b,Option.none());
+    }
+
+    @Test
+    public void testFilter()
+    {
+        Option<Integer> b = Option(identidadPosibleNull(2));
+        Option<Integer> r = b.filter(x->x.intValue()<4);
+        assertEquals(r.getOrElse(666).intValue(),2);
+    }
+
+    @Test
+    public void testFilterNone()
+    {
+        Option<Integer> b = Option(identidadPosibleNull(1));
+        Option<Integer> r = b.filter(x->x.intValue()<4);
+        assertEquals(r,Option.none());
+    }
+
+    @Test
+    public void mapInOption()
+    {
+        Option<Integer> o1 = Option(identidadPosibleNull(8));
+        Option<Integer> o2 = o1.map(x->x-8); // Resultado de la Lambda es un Option osea Some
+
+        assertEquals(o2,Some(0));
+    }
+
+    @Test
+    public void mapInOptionNone()
+    {
+        Option<Integer> o1 = Option(identidadPosibleNull(3));
+        Option<Integer> o2 = o1.map(x->x*3); // Resultado de la Lambda es un Option osea Some
+        System.out.println(o1.map(x->x*3));
+        assertEquals(o2,Option.none());
+    }
+
+    private Integer identidadPosibleNull(int i)
+    {
+        boolean res = false;
+        if(i%2==0){
+            return new Integer(i);
+        }
+        else {
+            return null;
+        }
+    }
+
+    private Boolean esParPosibleNull(int i)
+    {
+        boolean res = false;
+        if(i%2==0){
+            return new Boolean(true);
+        }
+        else {
+            return null;
+        }
+    }
 
     /**
      * Un option se puede filtar, y mostrar un some() o un none si no encuentra el resultado
@@ -113,6 +190,7 @@ public class OptionSuite {
     public void testGetOrElse(){
         Option<String> defined_option = Option.of("Hello!");
         Option<String> none = None();
+        System.out.println();
         assertEquals("failure - getOrElse did not get the current value of Option", "Hello!", defined_option.getOrElse("Goodbye!"));
         assertEquals("failure - getOrElse did not replace None", "Goodbye!", none.getOrElse("Goodbye!"));
     }
@@ -223,4 +301,54 @@ public class OptionSuite {
                                    For(esPar(4), c -> Option(d+c))).toOption();
         assertEquals(integers,Some(6));
     }
+
+
+    private Option<Integer> sumar (int a, int b){
+        System.out.println("sumando "+ a + "+" + b);
+        return Option.of(a+b);
+    }
+
+    private Option<Integer> restar (int a, int b){
+        System.out.println("restando "+ a + "-" + b);
+        return a-b >0 ? Option.of(a-b):None(); // da el option de la resta si es positva sino da None
+    }
+
+
+    @Test
+    public void flatMapInOPtion1(){
+
+       Option<Integer> resultado = sumar(1,1).flatMap(a -> sumar(a,1))
+             .flatMap(b -> sumar(b,1))
+             .flatMap(c->sumar(c,1))
+             .flatMap(d ->sumar(d,1));
+       assertEquals(resultado.getOrElse(666).intValue(),6);
+    }
+    @Test
+    public void flatMapInOPtionNone(){
+
+        Option<Integer> resultado = sumar(1,1).flatMap(a -> sumar(a,1))
+                .flatMap(b -> restar(b,4))  // El flatMap se ejecuta pero la lambda no, dado que flatMap al operar por None da none
+                .flatMap(c->sumar(c,1))
+                .flatMap(d ->sumar(d,1));
+        assertEquals(resultado, None());
+        assertEquals(resultado.getOrElse(666).intValue(),666);
+    }
+
+    @Test
+    public void flatMapInOPtionFor(){
+
+        Option<Integer> res =
+            For(sumar(1,1), r1 ->
+            For(sumar(r1,1), r2 ->
+            For(sumar(r2,1), r3 -> sumar(r3,r1)))).toOption();
+        assertEquals(res.getOrElse(666).intValue(),6);
+    }
+
+    @Test
+    public void flatMapInOPtion(){
+        Option<Integer> o1 = Option.of(1);
+        Option<Option<Integer>> x =o1.map(i->Option.of(identidadPosibleNull(i.intValue()-3))); //Option de oPtion
+        Option<Integer> y = o1.flatMap(i-> Option.of(identidadPosibleNull(i.intValue()-3)));
+    }
+
 }
