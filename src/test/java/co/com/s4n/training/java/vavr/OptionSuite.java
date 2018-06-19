@@ -1,5 +1,6 @@
 package co.com.s4n.training.java.vavr;
 
+import co.com.s4n.training.java.jdk.Prueba;
 import org.junit.Test;
 
 import io.vavr.PartialFunction;
@@ -302,6 +303,7 @@ public class OptionSuite {
         assertEquals(integers,Some(6));
     }
 
+<<<<<<< HEAD
 
     private Option<Integer> sumar (int a, int b){
         System.out.println("sumando "+ a + "+" + b);
@@ -349,6 +351,23 @@ public class OptionSuite {
         Option<Integer> o1 = Option.of(1);
         Option<Option<Integer>> x =o1.map(i->Option.of(identidadPosibleNull(i.intValue()-3))); //Option de oPtion
         Option<Integer> y = o1.flatMap(i-> Option.of(identidadPosibleNull(i.intValue()-3)));
+=======
+    @Test
+    public void flatMapInOPtionOPeraciones(){
+        Option<Integer> multiplicar = Prueba.multiplicar(4,3)
+                .flatMap(b -> Prueba.division(b,1))
+                .flatMap(c->Prueba.comparar(c,1))
+                .flatMap(d ->Prueba.postivo(d));
+        assertEquals(multiplicar.getOrElse(666).intValue(),12);
+    }
+    @Test
+    public void flatMapInOPtionForOPeraciones(){
+        Option<Integer> res =
+                For(Prueba.multiplicar(3,1), r1 ->
+                        For(Prueba.division(r1,1), r2 ->
+                                For(Prueba.comparar(r2,1), r3 -> Prueba.postivo(r3)))).toOption();
+        assertEquals(res.getOrElse(666).intValue(),3);
+>>>>>>> feature/PruebaSuite
     }
 
 }
