@@ -4,6 +4,11 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import org.junit.Test;
+import io.vavr.control.Option;
+
+
+import java.util.NoSuchElementException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static io.vavr.collection.Iterator.empty;
@@ -33,7 +38,27 @@ public class ListSuite {
     public void testZipOnEmptyList() {
         List<String> list = List.of();
         assertTrue("Failure - List should be empty",list.isEmpty());
-        list.zip(empty());
+        List<Tuple2<String, Object>> zip = list.zip(empty());
+        assertTrue(zip.size()==0);
+    }
+
+
+    @Test
+
+    public void  testingZip(){
+        List<Integer> l1 = List.of(1,2,3);
+        List<Integer> l2 = List.of(1,2,3);
+        List<Tuple2<Integer,Integer>> zip = l1.zip(l2);
+        System.out.println("Zip:"+ zip);
+        assertEquals(zip.headOption().getOrElse(new Tuple2(0,0)),new Tuple2(1,1));
+    }
+    @Test
+    public void  testingZipwithDiferentsize(){
+        List<Integer> l1 = List.of(1,2);
+        List<Integer> l2 = List.of(1,2,3);
+        List<Tuple2<Integer,Integer>> zip = l1.zip(l2);
+        System.out.println("Zip:"+ zip);
+        assertEquals(zip.headOption().getOrElse(new Tuple2(0,0)),new Tuple2(1,1));
     }
 
     @Test
@@ -52,12 +77,49 @@ public class ListSuite {
     }
 
     @Test
+    public void testTailP(){
+        List<Integer> list1 = List.of(1);
+        List<Integer> expectedTail = List.of();
+        List<Integer> tail = list1.tail();
+        assertEquals(tail, expectedTail);
+    }
+
+    @Test(expected = java.util.NoSuchElementException.class)
+    public void tesHeadP(){
+        List<Integer> list1 = List.of();
+        Integer expectedHead = 0;
+        Integer head = list1.head();
+        assertEquals(head, expectedHead);
+    }
+
+    @Test
+    public void testHeadOption()
+    {
+        List<Integer> list1 = List.of();
+        Option head = list1.headOption();
+        assertEquals(head, Option.none());
+    }
+
+
+    @Test
+    public void testHeadOption1()
+    {
+        List<Integer> list1 = List.of(1,2,3,4);
+        Option head = list1.headOption();
+
+        assertEquals(head,Option.some(1));
+        assertEquals(1,head.getOrElse(1));
+
+    }
+
+    @Test
     public void testZip(){
         List<Integer> list1 = List.of(1,2,3);
         List<Integer> list2 = List.of(1,2,3);
         List<Tuple2<Integer, Integer>> zippedList = list1.zip(list2);
         assertEquals(zippedList.head(), Tuple.of(new Integer(1), new Integer(1)) );
         assertEquals(zippedList.tail().head(), Tuple.of(new Integer(2), new Integer(2)) );
+
     }
 
     /**
@@ -69,6 +131,7 @@ public class ListSuite {
         List<Integer> list2 = list1.map(i -> i);
         assertEquals(List.of(0, 1, 2),list1);
         assertNotSame(list1,list2);
+
     }
 
     public String nameOfNumer(int i){
@@ -142,19 +205,48 @@ public class ListSuite {
         List<String> list = List.of("B", "A");
 
         assertEquals("Failure pop does not drop the first element of the his list",
-                List.of("A"), list.pop());
+                List.of("A"), list.pop()); //sacar un elemento
 
         assertEquals("Failure push does not add the element as the first in his list",
-                List.of("D", "C", "B", "A"), list.push("C", "D"));
+                List.of("D", "C", "B", "A"), list.push("C", "D")); // Ingresa elementos
 
         assertEquals("Failure push does not add the element as the first in his list",
                 List.of("C", "B", "A"), list.push("C"));
 
         assertEquals("Failure it's a lie first in last out",
                 List.of("B", "A"), list.push("C").pop());
-
         assertEquals("Failure don't return the correct tuple",
                 Tuple.of("B", List.of("A")), list.pop2());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void popWithEMpety(){
+        List<Integer> list1 = List.of();
+        List<Integer> list2 = list1.pop();
+        assertEquals(list2,empty());
+    }
+
+    @Test
+    public void popWithEMpetyOPtion(){
+        List<Integer> list1 = List.of();
+        Option<List<Integer>> list2 = list1.popOption();
+        assertEquals(list2,Option.none());
+    }
+
+    @Test
+    public void popAndTail(){
+        List<Integer> list1 = List.of(1,2,3,4,5);
+        assertEquals(list1.tail(),list1.pop());  // Tail y Pop hacen lo mismo, con la diferencia de mensajes en las excepciones
+        assertEquals(list1.tailOption(),list1.popOption());
+    }
+
+    @Test
+    public void pop2WithLargerList(){
+        List<Integer> list1 = List.of(1,2,3,4,5,6,7,8,9);
+        Tuple2<Integer,List<Integer>> list2 = list1.pop2();
+        System.out.println(list2);
+        assertEquals(list2._1.intValue(),1);
+        assertEquals(list2._2,List.of(2,3,4,5,6,7,8,9));
     }
 
     /**
@@ -173,6 +265,7 @@ public class ListSuite {
         list = list.push("e");
         assertEquals("The list did not behave as a stack", List.of("d", "c", "b", "a"), list.pop());
         assertEquals("The list did not behave as a stack", "e", list.peek());
+        System.out.println(list.pop());
     }
 
     /**
@@ -194,15 +287,56 @@ public class ListSuite {
     @Test
     public void testListToTakeWhile() {
         List<Integer> myList = List.ofAll(4, 6, 8, 5);
+        System.out.println(myList);
         List<Integer> myListOne = List.ofAll(2, 4, 3);
+        System.out.println(myListOne);
         List<Integer> myListRes = myList.takeWhile(j -> j < 8);
+        System.out.println(myListRes);
         List<Integer> myListResOne = myListOne.takeWhile(j -> j > 2);
+        System.out.println(myListResOne);
         assertTrue("List with values less than eight", myListRes.nonEmpty());
         assertEquals("List with length of two", 2, myListRes.length());
         assertEquals("List with last value six", new Integer(6), myListRes.last());
         assertTrue("List with values greater than two", myListResOne.isEmpty());
     }
 
+
+    @Test
+    public void testFold()
+    {
+        List<Integer> list = List.of(1,2,3,4,5);
+        Integer r = list.fold(0,(acc,el)-> acc + el);
+        //System.out.println(r);
+        assertEquals(r.intValue(),15);
+
+        // Test with String
+        List<String> list1 = List.of("A","B");
+        String r1 = list1.foldLeft("",(acc,el)-> acc + el);
+        System.out.println(r1);
+        String r2 = list1.foldRight("",(el,acc)-> acc + el);
+        System.out.println(r2);
+        assertEquals("AB",r1);
+        assertEquals("BA",r2);
+
+    }
+
+    @Test
+    public void testFoldLeft()
+    {
+        List<Integer> list = List.of(1,2,3,4,5);
+        Integer r = list.foldLeft(0,(acc,el)-> acc - el);
+        System.out.println(r);
+        assertEquals(r.intValue(),-15);
+    }
+
+    @Test
+    public void testFoldRight()
+    {
+        List<Integer> list = List.of(1,2,3,4,5);
+        Integer r = list.foldRight(0,(el,acc)-> acc - el); //Cambia el orden
+        System.out.println(r);
+        assertEquals(r.intValue(),-15);
+    }
     /**
      * Se puede separar una lista en ventanas de un tamaño especifico
      */
