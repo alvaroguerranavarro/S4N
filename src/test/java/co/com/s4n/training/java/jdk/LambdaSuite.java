@@ -233,8 +233,8 @@ public class LambdaSuite {
 
             ClaseDeEjemplo1 instancia = new ClaseDeEjemplo1();
 
-            int resultado = instancia.metodoDeEjemplo1(3, i);
+            int resultado = instancia.metodoDeEjemplo1(2, i);
 
-            assertEquals(75,resultado);
+            assertEquals(50,resultado);
         }
 }
