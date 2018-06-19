@@ -74,9 +74,9 @@ public class ValidationSuite
     public void testValidation1() {
 
         Validation<Seq<String>, MyClass> res =  Validation
-                .combine(validateAge(15),
+                .combine(validateAge(15),   // Ejecuta todas las operaciones independiente de que si son invalid o valid
                         validateAmount(15000))
-                .ap(MyClass::new);
+                .ap(MyClass::new); // Construye un Myclass con las salidas  validas
 
         MyClass myClass = res.get();
 
@@ -96,11 +96,11 @@ public class ValidationSuite
         Validation<Seq<String>, MyClass> res=  Validation
                 .combine(validateAge(13),
                         validateAmount(15000))
-                .ap(MyClass::new);
-
+                .ap(MyClass::new); // Solo se ejecuta si todas las validaciones son valid
+                //Seq<String> solo toma las invalid
         // Este acceso es inseguro porque no se sabe si fue valid o invalid.
         // en este caso esto lanza una excepción. Esto significa que el accesor get sobre un Validation es INSEGURO!
-        MyClass myClass = res.get();
+        MyClass myClass = res.get(); //.get inseguro porque no sabemos si es valid o invalid
 
         assertTrue("ap should be invalid",res.isInvalid());
     }
@@ -124,18 +124,17 @@ public class ValidationSuite
         Validation<Seq<String>, MyClass> res=  Validation
                 .combine(validateAge(13),
                         validateAmount(10000))
-                .ap(MyClass::new);
-
+                .ap(MyClass::new); // SOlo vamos .ap si son valid
 
                 res.fold(
                         s -> {
                             assertTrue(s.size()==2);
-                            assertTrue(s.contains("Age must be at least " + 14));
+                            assertTrue(s.contains("Age must be at least " + 14)); //.contains para acceder a los detalles
                             assertTrue(s.contains("Amount must be at least " + 1400));
                             return s.size();
                         },
                         
-                        c -> 2);
+                        c -> 2); // La segunda lambda solo se ejecuta si es valid
 
     }
 
@@ -149,13 +148,23 @@ public class ValidationSuite
         Validation<Error,String> valid2 = Validation.valid("Go!");
         Validation<Error, String> invalid = Validation.invalid(new Error("Stop!"));
 
-        Validation<Seq<Error>, String> finalValidation = Validation.combine(valid, invalid , valid2).ap((v1,v2,v3) -> v1 + v2 + v3);
+        Validation<Seq<Error>, String> finalValidation = Validation
+                .combine(valid, invalid , valid2)
+                .ap((v1,v2,v3) -> v1 + v2 + v3);
 
         assertEquals("Failure - Combine with an invalid Validation didn't return the error",
                 "Stop!",
-                finalValidation.getError().get(0).getMessage());
+                finalValidation.getError().get(0).getMessage()); //.getError nos da los posibles errores
+
+        System.out.println(finalValidation.getError().get(0).getMessage());
 
         // Cambialo para que verifiques con fold! :D
+
+        finalValidation.fold(
+                s -> {
+                    assertEquals("Stop!",s.get(0).getMessage());
+                    return s.size();
+                }, c -> "Start");
     }
 
     /**
@@ -229,11 +238,30 @@ public class ValidationSuite
 
         Validation.Builder8<String, String, Integer, Option<String>, String, String, String, String, String> result8 =
                 Validation.combine(v1,v2,v3,v4,v5,v6,v7,v8);
-
+            // una cosa es el combine y otra es el app, .Builder8 nos permite usar .app en una parte diferente
         assertEquals("Failure - ",
                 "Valid(John Doe,39,address,111-111-1111,alt1,alt2,alt3,alt4)",
                 result8.ap(TestValidation::new).toString());
     }
+
+    @Test
+    public void testBuilder7() {
+
+        Validation<String, String> v1 = Validation.valid("John Doe");
+        Validation<String, Integer> v2 = Validation.valid(39);
+        Validation<String, Option<String>> v3 = Validation.valid(Option.of("address"));
+
+        Validation<String, String> v4 = Validation.valid("111-111-1111");
+        Validation<String, String> v5 = Validation.valid("alt1");
+        Validation<String, String> v6 = Validation.valid("alt2");
+        Validation<String, String> v7 = Validation.valid("alt3");
+        Validation<String, String> v8 = Validation.valid("alt4");
+
+        //Validation.Builder7<String, String, Integer, Option<String>, String, String, String, String> result7 =
+                //Validation.combine(v1,v2,v3,v4,v5,v6,v7).ap(TestValidation::new);
+        //Dado que Testvalidation recibe 8 parametros
+    }
+
 
     /**
      *  Me permite recorrer una coleccion de Validation y operarlos
@@ -255,6 +283,19 @@ public class ValidationSuite
         validation.forEach(consumer);
         assertEquals("Failure- Was not operated",
                 Arrays.asList("Operacion 0","Operacion 1","Operacion 2"),msg);
+    }
+
+    @Test
+    public void testValidAndInvalid() {
+        ArrayList<String> valid = new ArrayList<>();
+        ArrayList<String> invalid = new ArrayList<>();
+
+        Validation<String, String> stop1 = Validation.invalid("Stop");
+        Validation<String, String> valid1 = Validation.valid("Valid1");
+        Validation<String, String>  stop2 = Validation.invalid("Stop1");
+        Validation<String, String> valid2 = Validation.valid("Valid2");
+        Validation<String, String> stop3 = Validation.invalid("Stop2");
+
     }
 
     /**
