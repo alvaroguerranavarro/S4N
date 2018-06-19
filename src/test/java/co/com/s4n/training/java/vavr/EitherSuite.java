@@ -3,7 +3,6 @@ package co.com.s4n.training.java.vavr;
 import co.com.s4n.training.java.jdk.BiPeek;
 import io.vavr.Function1;
 import io.vavr.control.Either;
-import org.junit.Test;
 
 import static io.vavr.API.Left;
 import static io.vavr.API.None;
@@ -11,16 +10,27 @@ import static io.vavr.API.Right;
 
 import java.util.function.Consumer;
 import java.io.Serializable;
-import static org.junit.Assert.assertArrayEquals;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+
+//import org.junit.Test;
+//import static org.junit.Assert.assertArrayEquals;
+//import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertTrue;
+//import static org.junit.Assert.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.IncludeEngines;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+@RunWith(JUnitPlatform.class)
+@IncludeEngines("junit-jupiter")
 public class EitherSuite {
 
     /**
@@ -32,14 +42,14 @@ public class EitherSuite {
         System.out.println(myEitherR);
         Either<Integer,String> myEitherL = Either.left(14);
         System.out.println(myEitherL);
-        assertTrue("Valide swap before in Either Right", myEitherR.isRight());
-        assertFalse("", myEitherR.isLeft());
-        assertTrue("Valide swap after in Eit.her Right", myEitherR.swap().isLeft());
-        assertFalse("", myEitherR.swap().isRight());
-        assertTrue("Valide swap before in Either Left", myEitherL.isLeft());
-        assertFalse("", myEitherL.isRight());
-        assertTrue("Valide swap after in Either Right", myEitherL.swap().isRight());
-        assertFalse("Eirther not is Rigth", myEitherL.swap().isLeft());
+        assertTrue(myEitherR.isRight());
+        assertFalse(myEitherR.isLeft());
+        assertTrue(myEitherR.swap().isLeft());
+        assertFalse(myEitherR.swap().isRight());
+        assertTrue(myEitherL.isLeft());
+        assertFalse(myEitherL.isRight());
+        assertTrue(myEitherL.swap().isRight());
+        assertFalse(myEitherL.swap().isLeft());
     }
 
     /**
@@ -54,10 +64,11 @@ public class EitherSuite {
         Either<Integer,Integer> e2 = Either.left(5);
 
         //El Either por defecto cuando se usa el map opera con el lado derecho.
-        assertEquals("Failure - Right projection", Right(10), e1.map(it -> it + 5));
+        assertEquals(Right(10), e1.map(it -> it + 5));
+
 
         //El Either para operar el lado izquierdo se debe usar un mapLeft.
-        assertEquals("Failure - Left Projection", Left(10), e2.mapLeft(it -> it + 5));
+        assertEquals(Left(10), e2.mapLeft(it -> it + 5));
     }
 
     /**
@@ -68,14 +79,12 @@ public class EitherSuite {
     public void testEitherMap() {
         Either<String,Double> value = Either.right( 2.0 / 3);
 
-        assertEquals("Failure - Map in Right",
-                Right(4.0),
+        assertEquals(Right(4.0),
                 value.map(aDouble -> aDouble * 6));
 
         Either<String,Double> value2 = Either.left("Left side");
 
-        assertEquals("Failure - the Either is not left",
-                Left("Left side"),
+        assertEquals(Left("Left side"),
                 value2.map(aDouble -> aDouble * 6));
 
     }
@@ -84,16 +93,13 @@ public class EitherSuite {
     public void testEitherMap1() {
         Either<String,Double> value = Either.right( 2.0 / 3);
 
-        assertEquals("Failure - Map in Right",
-                Right(4.0),
+        assertEquals(Right(4.0),
                 value.map(aDouble -> aDouble * 6));
 
         Either<String,Double> value2 = Either.left("Left side");
 
-        assertEquals("Failure - the Either is not left",
-                Left("Left side"),
+        assertEquals(Left("Left side"),
                 value2.map(aDouble -> aDouble * 6));
-
     }
 
     /**
@@ -105,14 +111,12 @@ public class EitherSuite {
 
         Either<String,Double> e1 = Either.right( 2.0 / 3);
 
-        assertEquals("Failure - flatMap in Right",
-                Right(4.0),
+        assertEquals(Right(4.0),
                 e1.flatMap(aDouble -> Right(aDouble * 6)));
 
         Either<String,Double> e2 = Either.left("Left side");
 
-        assertEquals("Failure - the Either is not left",
-                Left("Left side"),
+        assertEquals(Left("Left side"),
                 e2.flatMap(aDouble -> Right(aDouble * 6)));
     }
 
@@ -135,8 +139,7 @@ public class EitherSuite {
                 .flatMap(r1 -> suma(r1,2)
                         .flatMap(r2->division(5,r2)));
 
-        assertEquals("Failure - the Either is not left",
-                Right(0),res);
+        assertEquals(Right(0),res);
 
     }
 
@@ -148,8 +151,7 @@ public class EitherSuite {
 
         Either<String,Integer> value = Either.right(7);
 
-        assertEquals("value is even",
-                None(),
+        assertEquals(None(),
                 value.filter(it -> it % 2 == 0));
     }
 
@@ -157,19 +159,17 @@ public class EitherSuite {
     public void testEitherFilterSome() {
 
         Either<String,Integer> value = Either.right(7);
-
-        assertEquals("value is even",
-                Some(7),
-                value.filter(it -> it % 1 == 7));
+        assertEquals(Some(Right(7)),
+                value.filter(it -> it/1 == 7));
     }
 
     /**
      * Si el predicado del filter tiene un null, el void lanzara un Nullpointerexception
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testEitherFilter2() {
         Either<String,Integer> value = Either.right(7);
-        value.filter(null);
+        assertThrows(NullPointerException.class, () -> value.filter(null));
     }
 
     /**
@@ -188,8 +188,8 @@ public class EitherSuite {
         Either<String,Integer> value = Either.right(5);
         Either<String,Integer> value2 = Either.left("this is some");
 
-        assertEquals("Failure map in right", Either.right(20),biMap.apply(value));
-        assertEquals("Failure map in left", Either.left("this the left"),biMap.apply(value2));
+        assertEquals(Either.right(20),biMap.apply(value));
+        assertEquals(Either.left("this the left"),biMap.apply(value2));
     }
 
     /**
@@ -206,11 +206,9 @@ public class EitherSuite {
         };
 
         myEitherR.orElseRun(addIfTrue);
-        assertEquals("Valide swap before in Either Right",
-                "let's dance! ", result[0]);
+        assertEquals("let's dance! ", result[0]);
         myEitherL.orElseRun(addIfTrue);
-        assertEquals("Valide swap before in Either Right",
-                "let's dance! 14", result[0]);
+        assertEquals("let's dance! 14", result[0]);
     }
 
     /**
@@ -233,13 +231,13 @@ public class EitherSuite {
         };
 
         Either<String, String> peek = myEitherL.peek(myConsumer);
-        assertEquals("Validete Either with peek","default", valor[0]);
+        assertEquals("default", valor[0]);
 
         myEitherR.peek(myConsumer);
-        assertEquals("Validete Either with peek","bar", valor[0]);
+        assertEquals("bar", valor[0]);
 
         myEitherL.peekLeft(myConsumer);
-        assertEquals("Validete Either with peek","foo", valor[0]);
+        assertEquals("foo", valor[0]);
     }
 
 
@@ -272,7 +270,7 @@ public class EitherSuite {
                 Case($Left($()), msg -> msg),
                 Case($(), "Not found")
         );
-        assertEquals("Failure - Pattern of either left doesn't catch the left projection", left.getLeft(), result);
+        assertEquals(left.getLeft(), result);
     }
 
     /**
@@ -287,7 +285,7 @@ public class EitherSuite {
                 Case($Right($()), msg -> msg),
                 Case($(), "Not found")
         );
-        assertEquals("Failure - Pattern of either right doesn't catch the left projection", right.getOrElse(""), result);
+        assertEquals( right.getOrElse(""), result);
     }
 
     /**
@@ -297,10 +295,8 @@ public class EitherSuite {
     public void testNarrow(){
         Either<Integer, String> either = Try.of(()-> "0").toEither(0);
         Either<Object, Object> copy = Either.narrow(either);
-        assertEquals("Failure - the result of narrows must be equals to the source",either,copy);
-        assertSame("Failure - Although the narrowed and the source have a different type specification, they must be the same object",
-                either,
-                copy);
+        assertEquals(either,copy);
+        assertSame(either, copy);
     }
 
     /**
@@ -311,7 +307,7 @@ public class EitherSuite {
     public void testFoldRight(){
         String[] actual = transform("text_to_transform", true).fold(l -> l.split("_"), r -> r.split("_"));
         String[] expected = {"TEXT", "TO", "TRANSFORM"};
-        assertArrayEquals("The arrays were not the same", expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     /**
@@ -323,7 +319,7 @@ public class EitherSuite {
     public void testFoldLeft(){
         String[] actual = transform("text_to_transform", false).fold(l -> l.split("_"), r -> r.split("_"));
         String[] expected = {"text", "to", "transform"};
-        assertArrayEquals("The arrays were not the same", expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     /**
@@ -338,8 +334,6 @@ public class EitherSuite {
         return either;
     }
 
-
-
     /**
      * Aunque la documentación de fold either dice que el tipado de los mapper para cada proyección
      * debe ser igual, aún así, el compilador permite crear los mapper con tipos diferentes.
@@ -347,9 +341,9 @@ public class EitherSuite {
     @Test
     public void testFoldWithTwoMappers(){
         Serializable rightProjection = transform("text_to_transform", true).fold(l -> l.split("_"), r -> r.length());
-        assertEquals("Right projection fold was nos successful","17", rightProjection.toString());
+        assertEquals("17", rightProjection.toString());
         Serializable leftProjection = transform("text_to_transform", false).fold(l -> l.split("_"), r -> r.length());
         String[] expected = {"text", "to", "transform"};
-        assertArrayEquals("Left projection fold was nos successful", expected, (String[])leftProjection);
+        assertArrayEquals(expected, (String[])leftProjection);
     }
 }

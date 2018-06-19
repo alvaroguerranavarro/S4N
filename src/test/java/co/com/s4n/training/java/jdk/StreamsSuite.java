@@ -1,17 +1,28 @@
 package co.com.s4n.training.java.jdk;
 
-import static org.junit.Assert.*;
+
 
 import co.com.s4n.training.java.*;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+//import static org.junit.Assert.*;
+//import org.junit.Ignore;
+//import org.junit.Test;
+//
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.platform.runner.IncludeEngines;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+@RunWith(JUnitPlatform.class)
+@IncludeEngines("junit-jupiter")
 
 public class StreamsSuite {
     @Test
@@ -261,7 +272,7 @@ public class StreamsSuite {
         assertTrue(true);
     }
 
-    @Test(expected = java.lang.IllegalStateException.class)
+    @Test
     public void testStreams14() {
         Stream<String> stream =
                 Stream.of("d2", "a2", "b1", "b3", "c")
@@ -272,7 +283,9 @@ public class StreamsSuite {
         assertTrue(b);
 
         //Un stream no se puede volver a usar despues de haberse ejecutado una operacion final sobre el :(
-        stream.noneMatch(s -> true);
+        assertThrows(IllegalStateException.class,()->{
+            stream.noneMatch(s -> true);
+        });
     }
 
     @Test

@@ -2,13 +2,25 @@ package co.com.s4n.training.java.vavr;
 
 import co.com.s4n.training.java.jdk.Prueba;
 import io.vavr.control.Try;
-import org.junit.Test;
 
 
 import static io.vavr.API.For;
 import static io.vavr.API.Success;
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+//import static junit.framework.TestCase.assertEquals;
+//import static org.junit.Assert.assertTrue;
+//import org.junit.Test;
+
+//
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.platform.runner.IncludeEngines;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+@RunWith(JUnitPlatform.class)
+@IncludeEngines("junit-jupiter")
 
 public class TestPrueba {
     @Test

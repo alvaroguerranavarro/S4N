@@ -1,11 +1,22 @@
 package co.com.s4n.training.java.jdk;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+//import static org.junit.Assert.*;
+//import org.junit.Test;
+
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.Supplier;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.platform.runner.IncludeEngines;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+@RunWith(JUnitPlatform.class)
+@IncludeEngines("junit-jupiter")
 
 public class LambdaSuite {
 

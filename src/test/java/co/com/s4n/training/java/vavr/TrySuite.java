@@ -4,20 +4,34 @@ import io.vavr.CheckedFunction1;
 import io.vavr.CheckedFunction2;
 import io.vavr.Function1;
 import io.vavr.control.Try;
-import org.junit.Test;
 import static io.vavr.API.*;
 import static io.vavr.Predicates.*;
 import static io.vavr.Patterns.*;
-import static junit.framework.TestCase.assertEquals;
 import io.vavr.PartialFunction;
 import java.util.ArrayList;
 import java.util.stream.Stream;
-
 import java.util.List;
 import java.util.function.Consumer;
 import static io.vavr.control.Try.failure;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+
+//import org.junit.Test;
+//import static junit.framework.TestCase.assertEquals;
+//import static org.junit.Assert.assertNotEquals;
+//import static org.junit.Assert.assertTrue;
+
+///
+
+import org.junit.jupiter.api.Test;
+
+import org.junit.platform.runner.IncludeEngines;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+
+@RunWith(JUnitPlatform.class)
+@IncludeEngines("junit-jupiter")
 
 public class TrySuite {
 
@@ -30,14 +44,12 @@ public class TrySuite {
         Try<Integer> myTrySuccess = Try.of(() -> 15 / 5 );
         Try<Integer> myTryFailure = Try.of(() -> 15 / 0 );
 
-        assertEquals("failed - the values is a Failure",
-                Success(3),
+        assertEquals(Success(3),
                 myTrySuccess);
 
         assertNotEquals(3,myTrySuccess);
 
-        assertTrue("failed - the values is a Failure",
-                myTryFailure.isFailure()); // verficamos que sea una falla
+        assertTrue(myTryFailure.isFailure()); // verficamos que sea una falla
     }
 
     private String patternMyTry(Try<Integer> myTry) {
@@ -55,12 +67,10 @@ public class TrySuite {
         Try<Integer> myTrySuccess = Try.of(() -> 15 / 5 );
         Try<Integer> myTryFailure = Try.of(() -> 15 / 0 );
 
-        assertEquals("Failure match optionList",
-                "Este Try es exitoso",
+        assertEquals("Este Try es exitoso",
                 patternMyTry(myTrySuccess));
 
-        assertEquals("Failure match optionList2",
-                "Este Try es fallido",
+        assertEquals("Este Try es fallido",
                 patternMyTry(myTryFailure));
     }
 
@@ -78,12 +88,10 @@ public class TrySuite {
         Try<Integer> myRecoverSuccess = recoverMyTry(15, 5);
         Try<Integer> myRecoverFailure = recoverMyTry(15, 0);
 
-        assertEquals("Failed - Error nor controlled",
-                Success(3),
+        assertEquals(Success(3),
                 myRecoverSuccess);
 
-        assertEquals("Failed - Error nor controlled",
-                Success(-1),
+        assertEquals(Success(-1),
                 myRecoverFailure);
     }
 
@@ -101,8 +109,7 @@ public class TrySuite {
                 .andThen(arr -> arr.add(20))
                 .map(arr -> arr.get(1));
 
-        assertEquals("Failure - it should return the value in the 1st position",
-                Try.success(30).toString(),
+        assertEquals(Try.success(30).toString(),
                 actual.toString());
     }
 
@@ -117,8 +124,7 @@ public class TrySuite {
         String transform = number.transform(self -> self.get() + " example of text");
         System.out.println(transform);
 
-        assertEquals("Failure - it should transform the number to text",
-                "5 example of text",
+        assertEquals("5 example of text",
                 transform);
     }
 
@@ -127,8 +133,7 @@ public class TrySuite {
         Try<String> cadena = Try.of(() -> "Alvaro");
         Try<Integer> cadena1 = cadena.map(x -> x.length()); // un Success de Integer
 
-        assertEquals("Failure - it should transform the number to text",
-                Success(6),
+        assertEquals(Success(6),
                 cadena1);
     }
 
@@ -138,9 +143,7 @@ public class TrySuite {
         Try<Integer> transform = number.transform(self -> self);
         System.out.println(transform);
 
-        assertEquals("Failure - it should transform the number to text",
-
-                Success(5),
+        assertEquals(Success(5),
                 transform);
     }
 
@@ -148,10 +151,14 @@ public class TrySuite {
     /**
      * La funcionalidad transform va a generar error sobre un try con error.
      */
-    @Test(expected = Error.class)
-    public void testFailTransformWhen() {
-        Try<Integer> error = Try.of(() -> {throw new Error("Error 1"); });
-        error.transform(self -> self.get() + " example of text");
+    @Test
+    public void testFailTransformWhen() throws Error{
+
+        assertThrows(Error.class, () -> {
+            Try<Integer> error = Try.of(() -> {throw new Error("Error 1"); });
+            error.transform(self -> self.get() + " example of text");
+        });
+
     }
 
     /**
@@ -170,8 +177,7 @@ public class TrySuite {
 
         Try<Integer> success_example = mapper.apply(result);
 
-        assertEquals("failed - flatMap on success try case wasn't working as expected",
-                Try.of(() -> 300),
+        assertEquals(Try.of(() -> 300),
                 success_example);
     }
 
@@ -185,8 +191,7 @@ public class TrySuite {
                 .flatMap(i_10 -> Try.of(() -> i_10 * 10));
         Try<Integer> exception = Try.of(() -> divide.apply(3,0));
         Try<Integer> fail_example = mapper.apply(exception);
-        assertEquals("failed - flatMap on failed try case wasn't working as expected",
-                failure(new ArithmeticException("/ by zero")).toString(),
+        assertEquals(failure(new ArithmeticException("/ by zero")).toString(),
                 fail_example.toString());
     }
 
@@ -199,10 +204,10 @@ public class TrySuite {
         CheckedFunction2<Integer, Integer, Integer> multiply = (a, b) -> a * b;
         Try<Integer> tryToDivide = Try.of(() -> divide.apply(70, 2));
         Try<Integer> tryToMultiply = tryToDivide.andThenTry(i -> multiply.apply(i, 2));
-        assertTrue("failure - The chaining of tries failed", tryToMultiply.isSuccess());
+        assertTrue(tryToMultiply.isSuccess());
         tryToDivide = Try.of(() -> divide.apply(70, 0));
         tryToMultiply = tryToDivide.andThenTry(i -> multiply.apply(i, 2));
-        assertTrue("failure - The chaining of tries succeded", tryToMultiply.isFailure());
+        assertTrue(tryToMultiply.isFailure());
     }
 
     /**
@@ -221,7 +226,7 @@ public class TrySuite {
                 throwable.printStackTrace();
             }
         });
-        assertTrue("failure - The chaining of tries failed", tryToMultiply.isSuccess());
+        assertTrue(tryToMultiply.isSuccess());
     }
 
     /**
@@ -241,24 +246,24 @@ public class TrySuite {
             }
         };
         Try<Double> valid = Try.of(() -> 25.0);
-        assertEquals("failed - Partial function was not applied correctly for a value of its domain",
-                Try.of(() -> 5.0),
+        assertEquals(Try.of(() -> 5.0),
                 valid.collect(square_root));
 
         Try<Double> invalid = Try.of(() -> -25.0);
-        assertTrue("failed - Partial function was not applied correctly for a value that doesn't belong to its domain",
-                invalid.collect(square_root).isFailure());
+        assertTrue(invalid.collect(square_root).isFailure());
     }
 
     /**
      * withResource es el metodo seguro para crear un try en base a una instancia de una clase que implemente la interfaz Autocloseable
      */
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testTryWithResources(){
         Stream<Integer> stream = Stream.of(1,2,3,4,5,6,7,8,9,10);
-        Try<String> try_stream = Try.withResources(() -> stream).of(s -> s.toString());
-        assertTrue("Failure - try was not successfully created", try_stream.isSuccess());
-        stream.count();
+        assertThrows(Exception.class, () -> {
+            Try<String> try_stream = Try.withResources(() -> stream).of(s -> s.toString());
+            assertTrue(try_stream.isSuccess());
+            stream.count();
+        });
     }
 
     /**
@@ -275,8 +280,7 @@ public class TrySuite {
         };
         Try.of(() -> {throw new Error("Error 1");})
                 .peek(addIfTrue);
-        assertEquals("Failure - it should not add the element",
-                true,
+        assertEquals(true,
                 tmp.isEmpty());
     }
 
@@ -294,8 +298,7 @@ public class TrySuite {
         };
         Try.of(() -> "add")
                 .peek(addIfTrue);
-        assertEquals("Failure - it should add the element",
-                "element",
+        assertEquals("element",
                 tmp.get(0));
     }
 
@@ -306,7 +309,7 @@ public class TrySuite {
     @Test
     public void testMapToTrySuccess() {
         Try<String> myRecoverSuccess =  Try.of(()-> ", Cool" ).map(x -> "This Try is good" + x);
-        assertEquals("Failed - Error nor controlled", Success("This Try is good, Cool"), myRecoverSuccess);
+        assertEquals(Success("This Try is good, Cool"), myRecoverSuccess);
     }
 
     /**
@@ -316,7 +319,7 @@ public class TrySuite {
     @Test
     public void testMapToTryFailure() {
         Try<Integer> myRecoverSuccessOne =  Try.of(()-> 3 ).map(x -> x/0);
-        assertTrue("Failed - Error nor controlled",myRecoverSuccessOne.isFailure());
+        assertTrue(myRecoverSuccessOne.isFailure());
     }
 
     /**
@@ -326,8 +329,8 @@ public class TrySuite {
     public void testFilterToTry() {
         Try<Integer> myFilterSuccess =  Try.of(()-> 12 ).filter(x -> x%3==0);
         Try<Integer> myFilterFailure =  Try.of(()-> 12 ).filter(x -> x%3/0==0);
-        assertTrue("Failed - Error nor controlled", myFilterFailure.isFailure());
-        assertEquals("Failed - Error nor controlled", Success(12), myFilterSuccess);
+        assertTrue(myFilterFailure.isFailure());
+        assertEquals(Success(12), myFilterSuccess);
     }
 
     /**
@@ -338,8 +341,8 @@ public class TrySuite {
         CheckedFunction2<Integer,Integer,Integer> my = ((a,b) -> a /b);
         Try<Integer> myFilterTrySuccess =  Try.of(()-> 15 ).filterTry(x -> (x + my.apply(6,2))%3==0);
         Try<Integer> myFilterTryFailure =  Try.of(()-> 15 ).filterTry(x -> (x + my.apply(6,0))%3==0);
-        assertTrue("Failed - Error nor controlled", myFilterTryFailure.isFailure());
-        assertEquals("Failed - Error nor controlled", Success(15), myFilterTrySuccess);
+        assertTrue(myFilterTryFailure.isFailure());
+        assertEquals(Success(15), myFilterTrySuccess);
     }
 
 
@@ -352,9 +355,8 @@ public class TrySuite {
     public void testTryAndRecoverWith() {
         Try<Integer> aTry = Try.of(() -> 2/0).recoverWith(ArithmeticException.class,Try.of(() ->  2));
         Try<Integer> aTry2 = Try.of(() -> 2/0).recoverWith(ArithmeticException.class,Try.of(() ->  2/0));
-        assertEquals("Does not recover of 2/0", Try.of(() -> 2), aTry);
-        assertEquals("RecoverWith does not work",
-                Try.failure(new ArithmeticException("/ by zero")).toString() ,
+        assertEquals( Try.of(() -> 2), aTry);
+        assertEquals(Try.failure(new ArithmeticException("/ by zero")).toString() ,
                 aTry2.toString());
     }
 
@@ -362,7 +364,7 @@ public class TrySuite {
     public void testTryAndRecoverWith1() {
 
         Try<Integer> aTry = Try.of(() -> 2/0).recover(ArithmeticException.class,2);
-        assertEquals("Does not recover of 2/0", Try.of(() -> 2), aTry);
+        assertEquals(Try.of(() -> 2), aTry);
     }
 
     private Try<Integer> suma(Integer a, Integer b)
@@ -433,9 +435,12 @@ public class TrySuite {
      *  El Recover retorna el valor a recuperar, pero sin Try, permitiendo que lance un Exception
      *  si, falla
      */
-    @Test(expected = ArithmeticException.class)
+    @Test
     public void testTryAndRecover() {
-        Try<Integer> aTry = Try.of(() -> 2 / 0).recover(ArithmeticException.class, 2/0);
+        assertThrows(ArithmeticException.class, ()->{
+            Try<Integer> aTry = Try.of(() -> 2 / 0).recover(ArithmeticException.class, 2/0);
+        });
+
     }
     /**
      *  Uso de MapTry
@@ -453,7 +458,7 @@ public class TrySuite {
             return result;
         };
         Try<Integer> aTry = Try.of(() -> 2).mapTry(checkedFunction1);
-        assertEquals("Failed the checkedFuntion", Success(1),aTry);
+        assertEquals(Success(1),aTry);
     }
 
 }
